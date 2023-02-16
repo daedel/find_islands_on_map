@@ -1,1 +1,1 @@
-docker run -it -v ${PWD}:/usr/src/app silent_eight python src/main.py
+docker run -it -v ${PWD}:/usr/src/app silent_eight python src/main.py $1
