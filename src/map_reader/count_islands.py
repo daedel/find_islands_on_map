@@ -3,14 +3,13 @@ from .read import read_map_file
 
 
 class Island:
-
-    def __init__(self, starting_points: List[Tuple[int, int]]):
+    def __init__(self, starting_points: List[Tuple[int, int]]) -> None:
         self._points: List[Tuple] = starting_points
 
-    def get_points(self):
+    def get_points(self) -> List[Tuple]:
         return self._points
 
-    def add_points(self, points: List[Tuple[int, int]]):
+    def add_points(self, points: List[Tuple[int, int]]) -> None:
         self._points.extend(points)
 
 
@@ -18,25 +17,45 @@ class IslandCounter:
     islands: List[Island] = []
 
     @property
-    def island_count(self):
+    def island_count(self) -> int:
         return len(self.islands)
 
-    def add_island(self, points: List[Tuple[int, int]]):
+    def add_island(self, points: List[Tuple[int, int]]) -> None:
+        neighbors = []
         for row, col in points:
-            if island_neighbor := self._get_neighbor(row, col):
-                island_neighbor.add_points(points)
-                return
+            neighbors.extend(self._get_neighbors(row, col))
+
+        neighbors = set(neighbors)
+
+        if len(neighbors) == 1:
+            next(iter(neighbors)).add_points(points)
+            return
+
+        if len(neighbors) > 1:
+            # create new island from old sub islands
+            new_island = Island(
+                [point for neighbor in neighbors for point in neighbor.get_points()]
+            )
+            new_island.add_points(points)
+            self.islands.append(new_island)
+
+            # remove sub islands
+            for neighbor in neighbors:
+                self.islands.remove(neighbor)
+            return
 
         self.islands.append(Island(points))
 
-    def _get_neighbor(self, row: int, col: int):
+    def _get_neighbors(self, row: int, col: int) -> List[Island]:
+        neighbors = []
         for island in self.islands[::-1]:
-            if self._check_if_island_is_next_to_point(island, row, col):
-                return island
-        return None
+            if self._check_if_island_is_next_to_point(island, row, col) and island not in neighbors:
+                neighbors.append(island)
+
+        return neighbors
 
     @staticmethod
-    def _check_if_island_is_next_to_point(island: Island, row: int, col: int):
+    def _check_if_island_is_next_to_point(island: Island, row: int, col: int) -> bool:
         for x, y in island.get_points()[::-1]:
             if row - 1 == x and col - 1 == y:
                 return True
@@ -56,18 +75,19 @@ class IslandCounter:
                 return True
         return False
 
-def get_all_islands_next_to(col, line):
+
+def get_all_islands_next_to(col, line) -> int:
     try:
         if line[col] == "0":
             return col
     except IndexError:
         return col
 
-    line[col] = '#'
+    line[col] = "#"
     return get_all_islands_next_to(col + 1, line)
 
 
-def count_islands(path_to_file: str):
+def count_islands(path_to_file: str) -> int:
     island_counter = IslandCounter()
     map_file = read_map_file(path_to_file)
     for row, line in enumerate(map_file):
@@ -78,9 +98,11 @@ def count_islands(path_to_file: str):
                 continue
 
             if line[col] == "1":
-                points = [(row, col + point_nr) for point_nr in range(get_all_islands_next_to(col, line) - col)]
+                points = [
+                    (row, col + point_nr)
+                    for point_nr in range(get_all_islands_next_to(col, line) - col)
+                ]
                 island_counter.add_island(points)
-
 
     map_file.close()
     return island_counter.island_count
