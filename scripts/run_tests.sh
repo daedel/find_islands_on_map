@@ -1,0 +1,1 @@
+docker run -it -v ${PWD}:/usr/src/app silent_eight python -m pytest tests/
