@@ -47,10 +47,14 @@ class IslandCounter:
 
             # remove sub islands
             for neighbor in neighbors:
-                self.islands.remove(neighbor)
+                self._remove(neighbor)
             return
 
         self._insert_island(Island(points))
+
+    def _remove(self, island: Island) -> None:
+        self.islands.remove(island)
+        self.island_count -= 1
 
     def _insert_island(self, island: Island) -> None:
         self.islands.append(island)
