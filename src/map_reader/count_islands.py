@@ -14,7 +14,6 @@ class Island:
 
 
 class IslandCounter:
-
     def __init__(self):
         self.islands: List[Island] = []
         self.island_count = 0
@@ -40,7 +39,9 @@ class IslandCounter:
 
         self._insert_island(Island(points))
 
-    def _merge_sub_islands(self, sub_islands: Set[Island], new_points: List[Tuple[int, int]]) -> None:
+    def _merge_sub_islands(
+        self, sub_islands: Set[Island], new_points: List[Tuple[int, int]]
+    ) -> None:
         new_island = Island(
             [point for sub_island in sub_islands for point in sub_island.get_points()]
         )
@@ -55,7 +56,9 @@ class IslandCounter:
         try:
             self.islands.remove(island)
         except ValueError:
-            print(f'{island} is not self.islands list. in This should not happend!. Exiting!')
+            print(
+                f"{island} is not self.islands list. in This should not happend!. Exiting!"
+            )
             exit(0)
         self.island_count -= 1
 
@@ -112,7 +115,7 @@ def get_all_islands_next_to(col, line) -> int:
 def count_islands(path_to_file: str) -> int:
     island_counter = IslandCounter()
     for row, line in read_map_file(path_to_file):
-        if all([item == '0' for item in line]):
+        if all([item == "0" for item in line]):
             # if line cointains only 0 remove all island
             # we dont have to check previous islands when there are all 0 in line
             island_counter.remove_all_islands()
