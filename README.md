@@ -11,3 +11,8 @@ sh scripts/count_islands.sh
 ```
 
 
+#### To run tests:
+```angular2html
+sh scripts/run_tests.sh
+```
+
