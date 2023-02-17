@@ -7,4 +7,8 @@ if __name__ == "__main__":
     if len(stdin_args) != 1:
         print("You have to pass exactly 1 parameter: path_to_file")
         exit(0)
-    print(count_islands(stdin_args[0]))
+
+    try:
+        print(count_islands(stdin_args[0]))
+    except FileNotFoundError:
+        print("File does not exist")
