@@ -14,11 +14,17 @@ class Island:
 
 
 class IslandCounter:
-    islands: List[Island] = []
 
-    @property
-    def island_count(self) -> int:
-        return len(self.islands)
+
+    # @property
+    # def island_count(self) -> int:
+    #     return len(self.islands)
+    def __init__(self):
+        self.islands: List[Island] = []
+        self.island_count = 0
+
+    def remove_all_islands(self):
+        self.islands = []
 
     def add_island(self, points: List[Tuple[int, int]]) -> None:
         neighbors = []
@@ -37,19 +43,26 @@ class IslandCounter:
                 [point for neighbor in neighbors for point in neighbor.get_points()]
             )
             new_island.add_points(points)
-            self.islands.append(new_island)
+            self._insert_island(new_island)
 
             # remove sub islands
             for neighbor in neighbors:
                 self.islands.remove(neighbor)
             return
 
-        self.islands.append(Island(points))
+        self._insert_island(Island(points))
+
+    def _insert_island(self, island: Island) -> None:
+        self.islands.append(island)
+        self.island_count += 1
 
     def _get_neighbors(self, row: int, col: int) -> List[Island]:
         neighbors = []
         for island in self.islands[::-1]:
-            if self._check_if_island_is_next_to_point(island, row, col) and island not in neighbors:
+            if (
+                self._check_if_island_is_next_to_point(island, row, col)
+                and island not in neighbors
+            ):
                 neighbors.append(island)
 
         return neighbors
@@ -83,15 +96,21 @@ def get_all_islands_next_to(col, line) -> int:
     except IndexError:
         return col
 
+    # mark field as visited
     line[col] = "#"
+
     return get_all_islands_next_to(col + 1, line)
 
 
 def count_islands(path_to_file: str) -> int:
     island_counter = IslandCounter()
-    map_file = read_map_file(path_to_file)
-    for row, line in enumerate(map_file):
-        line = list(line.strip())
+    for row, line in read_map_file(path_to_file):
+        if all([item == '0' for item in line]):
+            # if line cointains only 0 remove all island
+            # we dont have to check previous islands when there are all 0 in line
+            island_counter.remove_all_islands()
+            continue
+
         num_cols = len(line)
         for col in range(num_cols):
             if line[col] == "#":
@@ -104,5 +123,4 @@ def count_islands(path_to_file: str) -> int:
                 ]
                 island_counter.add_island(points)
 
-    map_file.close()
     return island_counter.island_count
