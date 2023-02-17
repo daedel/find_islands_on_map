@@ -5,14 +5,14 @@ run
 sh scripts/build.sh
 ```
 
-#### To run program just type:
+#### To run program just type: you have to pass parameter which is path to text file with map.
 ```angular2html
-sh scripts/count_islands.sh
+sh scripts/count_islands.sh  input.txt
 ```
 
 
 #### To run tests:
 ```angular2html
-sh scripts/run_tests.sh input.txt
+sh scripts/run_tests.sh
 ```
 
