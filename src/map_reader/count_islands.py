@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Set
 from .read import read_map_file
 
 
@@ -15,10 +15,6 @@ class Island:
 
 class IslandCounter:
 
-
-    # @property
-    # def island_count(self) -> int:
-    #     return len(self.islands)
     def __init__(self):
         self.islands: List[Island] = []
         self.island_count = 0
@@ -39,21 +35,28 @@ class IslandCounter:
 
         if len(neighbors) > 1:
             # create new island from old sub islands
-            new_island = Island(
-                [point for neighbor in neighbors for point in neighbor.get_points()]
-            )
-            new_island.add_points(points)
-            self._insert_island(new_island)
-
-            # remove sub islands
-            for neighbor in neighbors:
-                self._remove(neighbor)
+            self._merge_sub_islands(neighbors, points)
             return
 
         self._insert_island(Island(points))
 
-    def _remove(self, island: Island) -> None:
-        self.islands.remove(island)
+    def _merge_sub_islands(self, sub_islands: Set[Island], new_points: List[Tuple[int, int]]) -> None:
+        new_island = Island(
+            [point for sub_island in sub_islands for point in sub_island.get_points()]
+        )
+        new_island.add_points(new_points)
+        self._insert_island(new_island)
+
+        # remove sub islands
+        for sub_island in sub_islands:
+            self._remove_island(sub_island)
+
+    def _remove_island(self, island: Island) -> None:
+        try:
+            self.islands.remove(island)
+        except ValueError:
+            print(f'{island} is not self.islands list. in This should not happend!. Exiting!')
+            exit(0)
         self.island_count -= 1
 
     def _insert_island(self, island: Island) -> None:
